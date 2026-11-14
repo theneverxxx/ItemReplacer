@@ -1,0 +1,14 @@
+{
+  "itemreplacer.title": "ItemReplacer",
+  "itemreplacer.enabled": "Item replacement",
+  "itemreplacer.sword_model": "Sword",
+  "itemreplacer.sword_skin": "Sword skin",
+  "itemreplacer.totem": "Totem",
+  "itemreplacer.gapple": "Golden apple",
+  "itemreplacer.other_players": "Other players",
+  "itemreplacer.sword_types": "Swords to replace...",
+  "itemreplacer.misc_items": "Server items...",
+  "key.itemreplacer.open": "ItemReplacer settings",
+  "key.categories.itemreplacer": "ItemReplacer",
+  "key.category.itemreplacer.main": "ItemReplacer"
+}

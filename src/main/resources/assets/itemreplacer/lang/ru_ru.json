@@ -1,0 +1,14 @@
+{
+  "itemreplacer.title": "ItemReplacer",
+  "itemreplacer.enabled": "Замена предметов",
+  "itemreplacer.sword_model": "Меч",
+  "itemreplacer.sword_skin": "Вид меча",
+  "itemreplacer.totem": "Тотем",
+  "itemreplacer.gapple": "Золотое яблоко",
+  "itemreplacer.other_players": "У других игроков",
+  "itemreplacer.sword_types": "Какие мечи заменять...",
+  "itemreplacer.misc_items": "Серверные предметы...",
+  "key.itemreplacer.open": "Настройки ItemReplacer",
+  "key.categories.itemreplacer": "ItemReplacer",
+  "key.category.itemreplacer.main": "ItemReplacer"
+}
