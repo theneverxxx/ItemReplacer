@@ -1,0 +1,115 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      - name: Set up Java
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: |
+            21
+            25
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          cache-disabled: true
+
+      - name: Check tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          MC=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)
+          VERSION=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
+          EXPECTED="v${VERSION}-${MC}"
+          if [ "$TAG" != "$EXPECTED" ]; then
+            echo "Tag $TAG does not match this branch, expected $EXPECTED"
+            exit 1
+          fi
+          echo "MC=$MC" >> "$GITHUB_ENV"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: |
+          chmod +x gradlew
+          ./gradlew build --no-daemon --no-build-cache
+
+      - name: Checksums
+        working-directory: build/libs
+        run: |
+          sha256sum *.jar > SHA256SUMS.txt
+          sha512sum *.jar > SHA512SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: build/libs/*.jar
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          JAR="itemreplacer-${VERSION}+${MC}.jar"
+          SHA256=$(cut -d' ' -f1 build/libs/SHA256SUMS.txt)
+          {
+            echo "ItemReplacer ${VERSION} для **Minecraft ${MC}** (Fabric)."
+            echo
+            echo "Нужен [Fabric API](https://modrinth.com/mod/fabric-api). [Mod Menu](https://modrinth.com/mod/modmenu) по желанию."
+            echo
+            echo "Jar собран GitHub Actions из коммита \`${COMMIT}\`."
+            echo
+            echo "### SHA-256"
+            echo '```'
+            cat build/libs/SHA256SUMS.txt
+            echo '```'
+            echo
+            echo "### Проверка"
+            echo
+            echo "Windows (PowerShell):"
+            echo '```powershell'
+            echo "(Get-FileHash .\\${JAR} -Algorithm SHA256).Hash"
+            echo '```'
+            echo "Linux / macOS:"
+            echo '```bash'
+            echo "sha256sum -c SHA256SUMS.txt"
+            echo '```'
+            echo "Должно совпасть с \`${SHA256}\`."
+            echo
+            echo "Проверка, что файл собран именно в этом репозитории ([GitHub CLI](https://cli.github.com/)):"
+            echo '```bash'
+            echo "gh attestation verify ${JAR} -R ${REPO}"
+            echo '```'
+          } > notes.md
+          gh release create "$TAG" \
+            build/libs/*.jar build/libs/SHA256SUMS.txt build/libs/SHA512SUMS.txt \
+            --repo "$REPO" \
+            --target "$COMMIT" \
+            --title "ItemReplacer ${VERSION} (Minecraft ${MC})" \
+            --notes-file notes.md \
+            --verify-tag

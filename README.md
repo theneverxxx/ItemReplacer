@@ -21,9 +21,28 @@
 
 ## Установка
 
-1. Поставь [Fabric Loader](https://fabricmc.net/use/) для Minecraft 1.21.11.
-2. Положи в папку `mods` [Fabric API](https://modrinth.com/mod/fabric-api) и `itemreplacer-1.0.0+1.21.11.jar`.
-3. [Mod Menu](https://modrinth.com/mod/modmenu) не обязателен, он только добавляет кнопку настроек в список модов.
+1. Скачай `itemreplacer-1.0.0+1.21.11.jar` со страницы [релиза v1.0.0-1.21.11](https://github.com/theneverxxx/ItemReplacer/releases/tag/v1.0.0-1.21.11).
+2. Поставь [Fabric Loader](https://fabricmc.net/use/) для Minecraft 1.21.11.
+3. Положи в папку `mods` [Fabric API](https://modrinth.com/mod/fabric-api) и скачанный jar.
+4. [Mod Menu](https://modrinth.com/mod/modmenu) не обязателен, он только добавляет кнопку настроек в список модов.
+
+## Проверка подлинности
+
+Jar в релизах собирает GitHub Actions прямо из этой ветки, когда пушится тег. Руками туда ничего не загружается.
+
+- К каждому релизу приложены `SHA256SUMS.txt` и `SHA512SUMS.txt`. Хеш скачанного файла должен совпасть:
+
+  ```powershell
+  (Get-FileHash .\itemreplacer-1.0.0+1.21.11.jar -Algorithm SHA256).Hash
+  ```
+
+- Каждый jar подписан аттестацией происхождения (Sigstore). Она доказывает, что файл собран в этом репозитории из конкретного коммита:
+
+  ```bash
+  gh attestation verify itemreplacer-1.0.0+1.21.11.jar -R theneverxxx/ItemReplacer
+  ```
+
+- Сборка воспроизводимая: если собрать jar из тега у себя (`./gradlew build`), получится тот же SHA-256.
 
 ## Настройки
 
