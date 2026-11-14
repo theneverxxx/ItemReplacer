@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "itemreplacer",
+  "version": "${version}",
+  "name": "ItemReplacer",
+  "description": "Replaces swords, totems, golden apples and server items with custom models. Client side only.",
+  "authors": ["theneverxxx"],
+  "contact": {
+    "sources": "https://github.com/theneverxxx/ItemReplacer",
+    "issues": "https://github.com/theneverxxx/ItemReplacer/issues"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/itemreplacer/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["itemreplacer.compat.ClientInit"],
+    "modmenu": ["itemreplacer.ModMenuIntegration"]
+  },
+  "mixins": ["itemreplacer.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "${mc_dependency}",
+    "java": ">=${java_version}",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}
