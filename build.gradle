@@ -45,3 +45,8 @@ tasks.withType(JavaCompile).configureEach {
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(project.java_version as int)
 }
+
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
